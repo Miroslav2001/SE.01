@@ -16,11 +16,27 @@ class Statistics:
         Score_silver = str(exel_file['Score'].iloc[1])
         Score_bronze = str(exel_file['Score'].iloc[2])
         message = (Name_gold + "  -  " + Score_gold)
-        arcade.draw_text(message, 200, 500, arcade.color.BLACK, 30)
+        arcade.draw_text(message, 200, 500, arcade.color.BLACK, 60)
         message = (Name_silver + "  -  " + Score_silver)
-        arcade.draw_text(message, 200, 400, arcade.color.BLACK, 30)
+        arcade.draw_text(message, 200, 400, arcade.color.BLACK, 60)
         message = (Name_bronze + "  -  " + Score_bronze)
-        arcade.draw_text(message, 200, 300, arcade.color.BLACK, 30)
+        arcade.draw_text(message, 200, 300, arcade.color.BLACK, 60)
+        message = "TOP 3 PLAYERS"
+        arcade.draw_text(message, 170, 600, arcade.color.BLACK, 20, font_name="Kenney Blocks")
+        message = "SCORES"
+        arcade.draw_text(message, 500, 600, arcade.color.BLACK, 20, font_name="Kenney Blocks")
+        message = "HighScore Table"
+        arcade.draw_text(message, 450, 700, arcade.color.BLACK, 40, font_name="Kenney Blocks")
+        arcade.draw_rectangle_outline(430, 416, 530, 300, arcade.color.BLACK, 5)
+        arcade.draw_line(165, 475, 696, 475, arcade.color.BLACK, 5)
+        arcade.draw_line(165, 375, 696, 375, arcade.color.BLACK, 5)
+        message = "1"
+        arcade.draw_text(message, 120, 500, arcade.color.GOLD, 30, font_name="Kenney Blocks")
+        message = "2"
+        arcade.draw_text(message, 120, 400, arcade.color.SILVER, 30, font_name="Kenney Blocks")
+        message = "3"
+        arcade.draw_text(message, 120, 300, arcade.color.BRONZE, 30, font_name="Kenney Blocks")
+
 
     def sort_table(self):
         exel_file = pd.read_csv("store-result.csv")

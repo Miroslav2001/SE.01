@@ -2,7 +2,8 @@ import arcade
 import Enemy
 
 SPRITE_SCALING = 0.8
-
+MOVEMENT_SPEED = 3
+MOVEMENT_SPEED_NEGATIVE = -5
 
 # Index of textures, first element faces left, second faces right
 TEXTURE_LEFT = 0

@@ -4,19 +4,14 @@ import random  # For generating random numbers for enemy movement.
 ENEMY1_SCALING = 1
 enemyScaling = 1
 SPRITE_SPEED = 1
-ENEMY_COUNT = 1
+ENEMY_COUNT = 5
 RUN_ENEMY = 1
-KILL_ENEMY = 2
-GHOST_SPEED = 0.1
+GHOST_SPEED = 0.5
 GHOST_COUNT = 0
 
 
 class Coin(arcade.Sprite):
-    """
-    This class represents the coins on our screen. It is a child class of
-    the arcade library's "Sprite" class.
-    """
-    levelOneList = arcade.SpriteList()
+
 
     def __init__(
             self,
@@ -62,12 +57,6 @@ class Coin(arcade.Sprite):
         elif self.center_x > player_sprite.center_x:
             self.center_x -= min(GHOST_SPEED, self.center_x - player_sprite.center_x)
 
-    def update(self):
-        if self.counter == 1:
-            self.imageSprite = "Sprite\Skeleton.png"
-        elif self.counter == 2:
-            self.imageSprite = "Sprite\WoodPlanks.png"
-
     def setup(self, wall_list):
         self.coin_list = arcade.SpriteList()
         self.update()
@@ -75,7 +64,7 @@ class Coin(arcade.Sprite):
         for i in range(ENEMY_COUNT):
             # Create the coin instance
             # Coin image from kenney.nl
-            coin = Coin(self.imageSprite, ENEMY1_SCALING)
+            coin = Coin("Sprite\Skeleton.png", ENEMY1_SCALING)
             coin_placed_successfully = False
 
             # Keep trying until success
