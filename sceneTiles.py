@@ -28,14 +28,8 @@ levelOneTiles = [
 
 ]
 
-
 class sceneTiles(arcade.SpriteList):
-
     def setupSceneOne(self):
-
-        self.allSpritesList = arcade.SpriteList()
-        self.levelOneList = arcade.SpriteList()
-
 
         leftPos = 0
         bottomPos = 0

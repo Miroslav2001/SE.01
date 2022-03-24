@@ -1,102 +1,93 @@
 import arcade
-import random
-import math
-ENEMY1_SCALING = 1
-enemyScaling = 1
-SPRITE_SPEED = 1
-COIN_COUNT = 1
+import random  # For generating random numbers for enemy movement.
 
-class Coin(arcade.Sprite):
-    """
-    This class represents the coins on our screen. It is a child class of
-    the arcade library's "Sprite" class.
-    """
+ENEMY1_SCALING = 1 # Scale of Sprite enemies
+SPRITE_SPEED = 1 # speed of skeletons
+ENEMY_COUNT = 5 # initial number of skeletons to be displayed
+GHOST_SPEED = 0.5 # speed of ghost
+GHOST_COUNT = 0 # initial number of ghosts
 
 
-    def __init__(self, position_list):
-        super().__init__()
-        self.position_list = position_list
-        self.cur_position = 0
-        self.coin_list = None
+class Enemy(arcade.Sprite):
+
+    def __init__(
+            self,
+            filename: str = None,
+            scale: float = 1):
+        super().__init__(filename, scale)
 
 
     def follow_sprite(self, player_sprite):
-        """
-        This function will move the current sprite towards whatever
-        other sprite is specified as a parameter.
-
-        We use the 'min' function here to get the sprite to line up with
-        the target sprite, and not jump around if the sprite is not off
-        an exact multiple of SPRITE_SPEED.
-        """
-
         if self.center_y < player_sprite.center_y:
-            self.center_y += min(SPRITE_SPEED, player_sprite.center_y - self.center_y)
+            self.center_y += min(GHOST_SPEED, player_sprite.center_y - self.center_y)
         elif self.center_y > player_sprite.center_y:
-            self.center_y -= min(SPRITE_SPEED, self.center_y - player_sprite.center_y)
+            self.center_y -= min(GHOST_SPEED, self.center_y - player_sprite.center_y)
 
         if self.center_x < player_sprite.center_x:
-            self.center_x += min(SPRITE_SPEED, player_sprite.center_x - self.center_x)
+            self.center_x += min(GHOST_SPEED, player_sprite.center_x - self.center_x)
         elif self.center_x > player_sprite.center_x:
-            self.center_x -= min(SPRITE_SPEED, self.center_x - player_sprite.center_x)
+            self.center_x -= min(GHOST_SPEED, self.center_x - player_sprite.center_x)
 
-    def random_update(self):
-        start_x = self.center_x
-        start_y = self.center_y
+    def setup(self, wall_list):
 
-        # Where are we going
-        dest_x = self.position_list[self.cur_position][0]
-        dest_y = self.position_list[self.cur_position][1]
+        for i in range(ENEMY_COUNT):
+            # Create the enemy instance
+            enemy = Enemy("Sprite\Skeleton.png", ENEMY1_SCALING)
+            enemy_placed_successfully = False
+            while not enemy_placed_successfully:
+                enemy.center_x = random.randrange(200, 1200)
+                enemy.center_y = random.randrange(100, 700)
+                while enemy.change_x == 0 and enemy.change_y == 0:
+                    enemy.change_x = random.randrange(-4, 5)
+                    enemy.change_y = random.randrange(-4, 5)
+                wall_hit_list = arcade.check_for_collision_with_list(enemy, wall_list)
+                coin_hit_list = arcade.check_for_collision_with_list(enemy, self.enemy_list)
+                if len(wall_hit_list) == 0 and len(coin_hit_list) == 0:
+                    enemy_placed_successfully = True
 
-        # X and Y diff between the two
-        x_diff = dest_x - start_x
-        y_diff = dest_y - start_y
+            self.enemy_list.append(enemy)
 
-        # Calculate angle to get there
-        angle = math.atan2(y_diff, x_diff)
+    def setup_ghost(self, wall_list):
+        self.ghost_list = arcade.SpriteList()
+        for i in range(GHOST_COUNT):
+            # Create the ghost instance
+            ghost = Enemy("Sprite\Ghost.png", ENEMY1_SCALING)
+            ghost_placed_successfully = False
 
-        # How far are we?
-        distance = math.sqrt((self.center_x - dest_x) ** 2 + (self.center_y - dest_y) ** 2)
+            while not ghost_placed_successfully:
+                # Position the coin
+                ghost.center_x = random.randrange(200, 1200)
+                ghost.center_y = random.randrange(100, 700)
+                while ghost.change_x == 0 and ghost.change_y == 0:
+                    ghost.change_x = random.randrange(-4, 5)
+                    ghost.change_y = random.randrange(-4, 5)
 
-        # How fast should we go? If we are close to our destination,
-        # lower our speed so we don't overshoot.
-        speed = min(self.speed, distance)
+                wall_hit_list = arcade.check_for_collision_with_list(ghost, wall_list)
+                ghost_hit_list = arcade.check_for_collision_with_list(ghost, self.ghost_list)
+                if len(wall_hit_list) == 0 and len(ghost_hit_list) == 0:
+                    # It is!
+                    ghost_placed_successfully = True
 
-        # Calculate vector to travel
-        change_x = math.cos(angle) * speed
-        change_y = math.sin(angle) * speed
+            self.ghost_list.append(ghost)
 
-        # Update our location
-        self.center_x += change_x
-        self.center_y += change_y
+    def random_movement(self, wall_list):
+        for enemy in self.enemy_list:
+            enemy.center_x += enemy.change_x
+            collide = arcade.check_for_collision_with_list(enemy, wall_list)
+            for wall in collide:
+                if enemy.change_x > 0:
+                    enemy.right = wall.left
+                elif enemy.change_x < 0:
+                    enemy.left = wall.right
+            if len(collide) > 0:
+                enemy.change_x *= -1
 
-        # How far are we?
-        distance = math.sqrt((self.center_x - dest_x) ** 2 + (self.center_y - dest_y) ** 2)
-
-        # If we are there, head to the next point.
-        if distance <= self.speed:
-            self.cur_position += 1
-
-            # Reached the end of the list, start over.
-            if self.cur_position >= len(self.position_list):
-                self.cur_position = 0
-
-
-
-    def setup(self):
-
-        self.coin_list = arcade.SpriteList()
-
-        for i in range(COIN_COUNT):
-            # Create the coin instance
-            # Coin image from kenney.nl
-            coin = Coin("Sprite\Skeleton.png", ENEMY1_SCALING)
-
-            # Position the coin
-            coin.center_x = random.randrange(1420)
-            coin.center_y = random.randrange(800)
-
-            # Add the coin to the lists
-            self.coin_list.append(coin)
-
-
+            enemy.center_y += enemy.change_y
+            walls_hit = arcade.check_for_collision_with_list(enemy, wall_list)
+            for wall in walls_hit:
+                if enemy.change_y > 0:
+                    enemy.top = wall.bottom
+                elif enemy.change_y < 0:
+                    enemy.bottom = wall.top
+            if len(walls_hit) > 0:
+                enemy.change_y *= -1
